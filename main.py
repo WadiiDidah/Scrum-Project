@@ -11,12 +11,15 @@ def getName():
         name_file = sys.argv[1]
         global file
         file = name_file
+        fi_out=open('output.txt','a')
+        fi_out.write(file+"\n")
     except :
         print("Veuillez preciser le PDF")
 
 def parseTitle():
     executePdf2Txt()
     file1 = open('temp.xml', 'r')
+    fi_out=open('output.txt','a')
     Lines = file1.readlines()
     
     index_max = 0
@@ -43,11 +46,12 @@ def parseTitle():
             if espace_b == 0:
                 espace_b = 1
                 title = title + " "
-    print(title)
+    fi_out.write(title+"\n")
 
 def getAbstract():
-	os.system("pdf2txt"+file+"-o temp.txt -A -V")
+	os.system("pdf2txt "+file+" -o temp.txt -A -V")
 	fi =open('temp.txt','r')
+	fi_out=open('output.txt','a')
 	lignes=fi.readlines()
 	fi.close()
 	debut=0
@@ -60,7 +64,7 @@ def getAbstract():
 			break
 		if (debut==1):
 			abstract=abstract+ligne
-	print(abstract)
+	fi_out.write(abstract+"\n")
 
 
 file = ""
@@ -68,5 +72,7 @@ getName()
 
 try:
     parseTitle()
+    getAbstract()
+    
 except:
     print("err")
