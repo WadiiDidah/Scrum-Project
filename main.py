@@ -45,6 +45,23 @@ def parseTitle():
                 title = title + " "
     print(title)
 
+def getAbstract();
+	fi =open('Boudin-Torres-2006.txt','r')
+	lignes=fi.readlines()
+	fi.close()
+	debut=0
+	abstract =""
+	for ligne in lignes:
+		if ("Abstract" in ligne or "ABSTRACT" in ligne ):
+			debut=1
+		if ("I." in ligne or "Introduction" in ligne or "INTRODUCTION" in ligne ):
+			debut=0
+			break
+		if (debut==1):
+			abstract=abstract+ligne
+	print(abstract)
+
+
 file = ""
 getName()
 
