@@ -45,8 +45,9 @@ def parseTitle():
                 title = title + " "
     print(title)
 
-def getAbstract();
-	fi =open('Boudin-Torres-2006.txt','r')
+def getAbstract():
+	os.system("pdf2txt"+file+"-o temp.txt -A -V")
+	fi =open('temp.txt','r')
 	lignes=fi.readlines()
 	fi.close()
 	debut=0
