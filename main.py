@@ -11,8 +11,9 @@ def getName():
         name_file = sys.argv[1]
         global file
         file = name_file
-        fi_out=open('output.txt','a')
-        fi_out.write(file+"\n")
+        fi_out=open('output.txt','r+')
+        fi_out.truncate()
+        fi_out.write("Name File: "+file+"\n")
     except :
         print("Veuillez preciser le PDF")
 
@@ -46,7 +47,7 @@ def parseTitle():
             if espace_b == 0:
                 espace_b = 1
                 title = title + " "
-    fi_out.write(title+"\n")
+    fi_out.write("Title: "+title+"\n")
 
 def getAbstract():
 	os.system("pdf2txt "+file+" -o temp.txt -A -V")
@@ -64,15 +65,20 @@ def getAbstract():
 			break
 		if (debut==1):
 			abstract=abstract+ligne
-	fi_out.write(abstract+"\n")
+	abstract = abstract.replace("Abstract","")
+	abstract = abstract.replace("ABSTRACT","")
+	abstract = abstract.replace("\n","")
+	fi_out.write("Abstract: "+abstract+"\n")
 
 
 file = ""
-getName()
+getName()   
 
 try:
-    parseTitle()
-    getAbstract()
+   
+        parseTitle()
+        getAbstract()
+       
     
 except:
     print("err")
