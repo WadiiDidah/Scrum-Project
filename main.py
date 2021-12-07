@@ -14,13 +14,15 @@ def outputFile():
 		fi_out.write("Title: "+title+"\n")
 		fi_out.write("Auteur: "+auteurs+"\n")
 		fi_out.write("Abstract: "+abstract+"\n")
+		fi_out.write("Abstract: "+References+"\n")
 	else:
 		fi_out=open('output.xml','r+')
 		fi_out.truncate()
 		fi_out.write("<article>\n\t<preamble>"+file+"</preamble>\n")
 		fi_out.write("\t<title>"+title+"</title>\n")
-		fi_out.write("\t<auteur>"+auteur+"</auteur>\n")
+		fi_out.write("\t<auteur>"+auteurs+"</auteur>\n")
 		fi_out.write("\t<abstract>"+abstract+"</abstract>\n")
+		fi_out.write("\t<biblio>"+References+"</biblio>\n")
 		fi_out.write("</article>")
 		return 0
 
@@ -135,12 +137,27 @@ def getAuteurs():
 	for aut in auteurs_t:
 		auteurs += aut+", "
 
+def getReferences():
+	global References
+	os.system("pdf2txt "+file+"   -VA  -o temp.txt ")
+	fi =open('temp.txt','r')
+	lignes=fi.readlines()
+	fi.close()
+	debut=0
+	for ligne in lignes:
+		if ("References" in ligne or "REFERENCES" in ligne):
+			debut=1
+		if (debut==1):
+			References=References+ligne
+
+
 file = ""
 abstract = ""
 title = ""
 type_file = ""
 title_end_line = 0
 auteurs = ""
+References=""
 
 getName()   
 
@@ -151,7 +168,9 @@ try:
 	parseTitle()
 	getAbstract()
 	getAuteurs()
+	getReferences()
 	outputFile()
 
 except:
 	print("err")
+
