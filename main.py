@@ -12,12 +12,14 @@ def outputFile():
 		fi_out.truncate()
 		fi_out.write("Name File: "+file+"\n")
 		fi_out.write("Title: "+title+"\n")
+		fi_out.write("Auteur: "+auteurs+"\n")
 		fi_out.write("Abstract: "+abstract+"\n")
 	else:
 		fi_out=open('output.xml','r+')
 		fi_out.truncate()
 		fi_out.write("<article>\n\t<preamble>"+file+"</preamble>\n")
 		fi_out.write("\t<title>"+title+"</title>\n")
+		fi_out.write("\t<auteur>"+auteur+"</auteur>\n")
 		fi_out.write("\t<abstract>"+abstract+"</abstract>\n")
 		fi_out.write("</article>")
 		return 0
@@ -46,7 +48,7 @@ def parseTitle():
 	espace_b = 1
 	full_size = 0.0
 	for line in Lines:
-		index_max += 1
+		index_max = 1 + index_max
 		if(index_max == 400):
 			break
 		m_size = re.search('size="(.)+\.([0-9])+',line)
@@ -89,20 +91,56 @@ def getAbstract():
 
 def getAuteurs():
 	global	title_end_line
+	global	auteurs
 	file1 = open('temp.xml', 'r')
 	Lines = file1.readlines()
 	i = 0
+	font_typed = False
+	font_style = ""
+	auteurs_t = []
+	auteur_t = ""
+	next_aut = False
+	# pour chaque lignes du fichier dans un interval 
 	for line in Lines:
-		if(i == title_end_line):
+		i += 1
+		# si on est dans l'interval
+		if(i > title_end_line):
+			# on recup le style des auteurs 
+			if(font_typed == False):
+				try:
+					font_style = re.search('^<text font="(.)+">',line).group(0)
+					font_style = re.sub('bbox=(.)+colours', '', font_style)
+					font_typed = True
+				except:
+					print("searching auteur")
+			else:
+				# si on l'a deja, prendre tous le text avec exactement le meme style d'ecriture
+				try:
+					inline = re.search('^<text font="(.)+">',line).group(0)
+					inline = re.sub('bbox=(.)+colours', '', inline)
+					if(font_style == inline):
+						m_auteur = re.search('">(.)+</text',line)
+						m_auteur = m_auteur.group(0).replace('">',"").replace('</text',"")
+						auteur_t = auteur_t + m_auteur
+						next_aut = False
+					elif next_aut == True:
+						auteurs_t.append(auteur_t)
+						auteur_t = ""
+						next_aut = False
+				except:
+					print("searching font")
+		if(i > (title_end_line+300)):
+			auteurs_t.append(auteur_t)
 			break
-		
-	return 0
+	for aut in auteurs_t:
+		auteurs += aut+", "
 
 file = ""
 abstract = ""
 title = ""
 type_file = ""
 title_end_line = 0
+auteurs = ""
 
 getName()   
 
@@ -112,6 +150,7 @@ try:
 		raise
 	parseTitle()
 	getAbstract()
+	getAuteurs()
 	outputFile()
 
 except:
