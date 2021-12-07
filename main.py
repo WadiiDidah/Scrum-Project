@@ -25,8 +25,8 @@ def outputFile():
 		return 0
 
 def executePdf2Txt():
-	print("pdf2txt "+file+" -o temp.xml")
-	os.system("pdf2txt "+file+" -o temp.xml")
+	print("pdf2txt -VA "+file+" -o temp.xml")
+	os.system("pdf2txt -VA "+file+" -o temp.xml")
 
 def getName():
 	try:
