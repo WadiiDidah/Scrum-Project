@@ -236,16 +236,18 @@ def getconclusion():
    	fi= open('temp.txt', 'r')
 	lignes = fi.readlines()
 	fi.close()
-	start = 0
+	debut=0
 	Conclusion = ""
 	for ligne in lignes:
-		if ("Conclusion" in ligne or "CONCLUSION" in ligne ):
-			start = 1
-		if ("References" in ligne or "Acknowledgments" in ligne or "Acknowledgments" in ligne):
-			start = 0
+		if ("Conclusion" in ligne or "CONCLUSION" in ligne):
+			debut=1
+		if ("ACKNOWLEDGMENT" in ligne  or "Acknowledgment" in ligne):
+			debut=0
 			break
-		if (start==1):
+		if (debut==1):
 			Conclusion = Conclusion + ligne
+	Conclusion=Conclusion.replace("\n","")
+			
 def menu():
 	global file
 	listpdf = os.popen("ls -m *.pdf").read()
