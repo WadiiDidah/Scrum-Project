@@ -8,6 +8,10 @@ def outputFile():
 	global title
 	global abstract
 	global intro
+	global corps
+	global Conclusion
+	global References
+	global discu
 	if(type_file == "-t"):
 		fi_out=open('output.txt','r+')
 		fi_out.truncate()
@@ -17,14 +21,21 @@ def outputFile():
 		fi_out.write("Abstract: "+abstract+"\n")
 		fi_out.write("Abstract: "+References+"\n")
 		fi_out.write("Introduction: "+intro+"\n")
+		fi_out.write("corps: "+corps+"\n")
+		fi_out.write("conclusion: "+Conclusion+"\n")
+		fi_out.write("discu: "+discu+"\n")
 	else:
 		fi_out=open('output.xml','r+')
 		fi_out.truncate()
+		
 		fi_out.write("<article>\n\t<preamble>"+file+"</preamble>\n")
 		fi_out.write("\t<title>"+title+"</title>\n")
 		fi_out.write("\t<auteur>"+auteurs+"</auteur>\n")
 		fi_out.write("\t<abstract>"+abstract+"</abstract>\n")
 		fi_out.write("\t<introduction>"+intro+"</introduction>\n")
+		fi_out.write("\t<corps>"+corps+"</corps>\n")
+		fi_out.write("\t<conclusion>"+Conclusion+"</conclusion>\n")
+		fi_out.write("\t<discussion>"+discu+"</discussion>\n")
 		fi_out.write("\t<biblio>"+References+"</biblio>\n")
 		fi_out.write("</article>")
 		return 0
@@ -149,9 +160,12 @@ def getReferences():
 	debut=0
 	for ligne in lignes:
 		if ("References" in ligne or "REFERENCES" in ligne):
-			debut=1
+			if (ligne[0]=="R"):
+				debut=1
 		if (debut==1):
 			References=References+ligne
+	References = References.replace("\n","")
+
 def getIntro():
 	global intro
 	global file
@@ -160,11 +174,19 @@ def getIntro():
 	lignes=fi.readlines()
 	fi.close()
 	debut=0
+	nblignefinintro=0
 	intro =""
 	for ligne in lignes:
+		nblignefinintro=nblignefinintro+1
 		if ("Introduction"in ligne or "INTRODUCTION" in ligne):
 			debut=1
 		if(ligne[0]=="2" and ligne[1]=="."):
+			debut=0
+			break
+		if(ligne[0]=="2" and ligne[1]==" " and ligne[2].isupper() ):
+			debut=0
+			break
+		if(ligne[0]=="2" and ligne[1]==" " and ligne[3].isupper() ):
 			debut=0
 			break
 		if(ligne[0]=="I" and ligne[1]=="I"and ligne[2]=="."):
@@ -173,7 +195,71 @@ def getIntro():
 		if (debut==1):
 			intro=intro+ligne
 	intro = intro.replace("\n","")
+	getcorps(nblignefinintro)
 
+def getcorps(nbLigneFinIntroduction) :
+	global corps
+	fi= open('temp.txt', 'r')
+	lignes = fi.readlines()
+	fi.close()
+	corps = ""
+	nb=0
+	for ligne in lignes:
+		nb = nb + 1
+		if(nb>nbLigneFinIntroduction):
+			if ("Conclusion" in ligne or "CONCLUSION" in ligne or "Discussion" in ligne or "DISCUSSION" in ligne or "ACKNOWLEDGMENTS" in ligne  or "Acknowledgments" in ligne):
+				break
+			corps = corps + ligne
+	corps= corps.replace("\n","")
+
+def getdiscussion():
+	global discu
+	fi =open('temp.txt','r')
+	lignes=fi.readlines()
+	fi.close()
+	debut=0
+	discu=""
+	for ligne in lignes:
+		if("Discussion" in ligne or "DISCUSSION" in ligne):
+			debut=1
+		if ("Conclusion" in ligne or "CONCLUSION" in ligne or "ACKNOWLEDGMENTS" in ligne  or "Acknowledgments" in ligne):
+			debut=0
+			break
+		if (debut==1):
+			if("Discussion" not in ligne or "DISCUSSION" not in ligne):
+				discu=discu+ligne
+	discu= discu.replace("\n","")
+	
+	
+def getconclusion():
+	global Conclusion
+   	fi= open('temp.txt', 'r')
+	lignes = fi.readlines()
+	fi.close()
+	start = 0
+	Conclusion = ""
+	for ligne in lignes:
+		if ("Conclusion" in ligne or "CONCLUSION" in ligne ):
+			start = 1
+		if ("References" in ligne or "Acknowledgments" in ligne or "Acknowledgments" in ligne):
+			start = 0
+			break
+		if (start==1):
+			Conclusion = Conclusion + ligne
+def menu():
+	global file
+	listpdf = os.popen("ls -m *.pdf").read()
+	listpdf = listpdf.replace(', ', ',').replace('\n', '')
+	listpdf = listpdf.split(',')
+
+	i = 0
+
+	print("Fichiers trouves :")
+	for pdf in listpdf:
+		print("\t"+str(i)+"."+pdf)
+		i+=1
+	choix = input("\nIndiquer un chiffre: ")
+	file=listpdf[int(choix)]	
 
 file = ""
 abstract = ""
@@ -183,17 +269,22 @@ type_file = ""
 title_end_line = 0
 auteurs = ""
 References=""
+corps=""
+Conclusion=""
+discu=""
 
-getName()   
+menu()
 
 try:
-	type_file = sys.argv[2]
+	type_file = sys.argv[1]
 	if((type_file != "-t") and (type_file != "-x")):
 		raise
 	parseTitle()
 	getAbstract()
 	getIntro()
+	getconclusion()
+	getdiscussion()
+	getReferences()
 	outputFile()
-
 except:
 	print("err")
