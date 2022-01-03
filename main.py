@@ -7,6 +7,7 @@ def outputFile():
 	global file
 	global title
 	global abstract
+	global intro
 	if(type_file == "-t"):
 		fi_out=open('output.txt','r+')
 		fi_out.truncate()
@@ -15,6 +16,7 @@ def outputFile():
 		fi_out.write("Auteur: "+auteurs+"\n")
 		fi_out.write("Abstract: "+abstract+"\n")
 		fi_out.write("Abstract: "+References+"\n")
+		fi_out.write("Introduction: "+intro+"\n")
 	else:
 		fi_out=open('output.xml','r+')
 		fi_out.truncate()
@@ -22,6 +24,7 @@ def outputFile():
 		fi_out.write("\t<title>"+title+"</title>\n")
 		fi_out.write("\t<auteur>"+auteurs+"</auteur>\n")
 		fi_out.write("\t<abstract>"+abstract+"</abstract>\n")
+		fi_out.write("\t<introduction>"+intro+"</introduction>\n")
 		fi_out.write("\t<biblio>"+References+"</biblio>\n")
 		fi_out.write("</article>")
 		return 0
@@ -149,10 +152,32 @@ def getReferences():
 			debut=1
 		if (debut==1):
 			References=References+ligne
+def getIntro():
+	global intro
+	global file
+	os.system("pdf2txt "+file+" -o temp.txt")
+	fi =open('temp.txt','r')
+	lignes=fi.readlines()
+	fi.close()
+	debut=0
+	intro =""
+	for ligne in lignes:
+		if ("Introduction"in ligne or "INTRODUCTION" in ligne):
+			debut=1
+		if(ligne[0]=="2" and ligne[1]=="."):
+			debut=0
+			break
+		if(ligne[0]=="I" and ligne[1]=="I"and ligne[2]=="."):
+			debut=0
+			break
+		if (debut==1):
+			intro=intro+ligne
+	intro = intro.replace("\n","")
 
 
 file = ""
 abstract = ""
+intro=""
 title = ""
 type_file = ""
 title_end_line = 0
@@ -167,10 +192,8 @@ try:
 		raise
 	parseTitle()
 	getAbstract()
-	getAuteurs()
-	getReferences()
+	getIntro()
 	outputFile()
 
 except:
 	print("err")
-
