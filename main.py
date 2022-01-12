@@ -6,6 +6,7 @@ def outputFile():
 	global type_file
 	global file
 	global title
+	global auteurs
 	global abstract
 	global intro
 	global corps
@@ -282,6 +283,7 @@ try:
 	if((type_file != "-t") and (type_file != "-x")):
 		raise
 	parseTitle()
+	getAuteurs()
 	getAbstract()
 	getIntro()
 	getconclusion()
